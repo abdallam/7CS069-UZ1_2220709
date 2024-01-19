@@ -8,11 +8,19 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Throwable;
+use Illuminate\Support\Facades\Storage;
 
 
 class Users extends Controller
 {
     private $output = ["error" => 0, 'code' => null, 'message' => null, 'data' => null];
+
+    public function test()
+    {
+        
+
+        // return User::find($request->user()->id)->blogs()->get();
+    }
 
     public function login(Request $request)
     {
@@ -52,11 +60,10 @@ class Users extends Controller
         if ($validator->errors()->isEmpty()) {
 
             try {
-                if($request->file()) {
-                    $fileName = Str::uuid().'.'.$request->photo->getClientOriginalExtension();
+                if ($request->file()) {
+                    $fileName = Str::uuid() . '.' . $request->photo->getClientOriginalExtension();
                     $filePath = $request->file('photo')->storeAs('profiles', $fileName, 'public');
-                    $file_path = '/storage/' . $filePath;
-                   
+                    $file_path =  $filePath;
                 }
 
                 $user = User::create([
@@ -95,6 +102,7 @@ class Users extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string',
                 'email' => 'required|email',
+                'photo' => 'mimes:png,jpeg,jpg|max:2048'
 
             ]);
             if ($validator->errors()->isEmpty()) {
@@ -184,7 +192,7 @@ class Users extends Controller
     {
 
         if ($request->user()->currentAccessToken()->delete()) {
-           
+
             return true;
         } else return false;
     }

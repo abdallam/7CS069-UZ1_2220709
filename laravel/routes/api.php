@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users;
+use App\Http\Controllers\Blogs;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,10 @@ use App\Http\Controllers\Users;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/test', [Users::class, 'test'])
+    ->middleware('guest');
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -36,5 +41,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/user/delete/{id}', 'delete');
 
         Route::post('/users/logout', 'logout');
+    });
+
+    Route::controller(Blogs::class)->group(function () {
+        Route::post('/blog/{id}', 'show');
+        Route::get('/blogs', 'get');
+        Route::post('/blogs/create', 'create');
+        Route::post('/blog/update/{id}', 'update');
+        Route::post('/blog/delete/{id}', 'delete');
     });
 });

@@ -38,7 +38,11 @@ class User extends Authenticatable
         'password',
         // 'remember_token',
     ];
+    protected $casts = [
+        'created_at' => 'datetime:M-d-Y H:i',
+        'updated_at' => 'datetime:M-d-Y H:i',
 
+    ];
     /**
      * The attributes that should be cast.
      *
@@ -47,5 +51,10 @@ class User extends Authenticatable
     public function scopeActive($query)
     {
         return $query->where('alive', 1);
+    }
+
+    public function blogs()
+    {
+        return $this->hasMany(Blog::class);
     }
 }
