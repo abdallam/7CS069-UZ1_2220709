@@ -32,7 +32,7 @@ Route::post('/users/login', [Users::class, 'login'])
     ->middleware('guest')
     ->name('login');
 
-Route::middleware(['auth:sanctum'])->group(function () {
+//Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::controller(Users::class)->group(function () {
         Route::post('/user/{id}', 'show');
@@ -50,4 +50,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/blog/update/{id}', 'update');
         Route::post('/blog/delete/{id}', 'delete');
     });
-});
+//});
