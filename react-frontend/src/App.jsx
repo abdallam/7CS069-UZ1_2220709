@@ -1,27 +1,29 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import HomePage from "./pages/Home";
-import BlogsPage from "./pages/Blogs";
-import BlogDetailsPage from "./pages/Blogs";
+import BlogsPage, {loader as blogsLoader} from "./pages/Blogs";
+import BlogDetailsPage from "./pages/BlogDetails";
 import BlogNewPage from "./pages/BlogNew";
 import BlogEditPage from "./pages/BlogEdit";
 import RootLayout from "./pages/Root";
+import ErrorPage from "./pages/Error";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-   // errorElement: <ErrorPage />,
+    errorElement: <ErrorPage />,
     children: [
       {
-       index:true,
+        index: true,
         element: <HomePage />,
       },
       {
         path: "blogs",
         element: <BlogsPage />,
+        loader: blogsLoader,
       },
       {
-        path: "blogs:blogId",
+        path: "blogs/show/:blogId",
         element: <BlogDetailsPage />,
       },
       {
@@ -29,7 +31,7 @@ const router = createBrowserRouter([
         element: <BlogNewPage />,
       },
       {
-        path: "blogs:blogId/edit",
+        path: "blogs/edit/:blogId",
         element: <BlogEditPage />,
       },
     ],
