@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Throwable;
-use Illuminate\Support\Facades\Storage;
 
 
 class Users extends Controller
@@ -17,7 +16,7 @@ class Users extends Controller
 
     public function test()
     {
-        
+
 
         // return User::find($request->user()->id)->blogs()->get();
     }
