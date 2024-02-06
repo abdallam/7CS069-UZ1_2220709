@@ -5,10 +5,14 @@ import BlogDetailsPage, {
   loader as blogLoader,
   action as deleteBlogAction,
 } from "./pages/BlogDetails";
-import BlogNewPage, { action as newBlogAction } from "./pages/BlogNew";
+import BlogNewPage from "./pages/BlogNew";
 import BlogEditPage from "./pages/BlogEdit";
 import RootLayout from "./pages/Root";
 import ErrorPage from "./pages/Error";
+import { action as BlogFormAction } from  "./components/BlogForm"
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 const router = createBrowserRouter([
   {
@@ -46,19 +50,25 @@ const router = createBrowserRouter([
       {
         path: "new",
         element: <BlogNewPage />,
-        action: newBlogAction,
+        action: BlogFormAction,
 
       },
       {
         path: "save",
-        action: newBlogAction,
+        action: BlogFormAction,
       },
     ],
   },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return       <div>
+  <RouterProvider router={router} />
+  <ToastContainer stacked />
+
+  </div>
+
+  ;
 }
 
 export default App;

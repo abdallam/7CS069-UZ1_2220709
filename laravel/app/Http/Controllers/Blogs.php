@@ -17,11 +17,11 @@ class Blogs extends Controller
 
     public function create(Request $request)
     {
-
+        
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255|min:5',
             'body' => 'required',
-            'user_id' => 'required|integer',
+          //  'user_id' => 'required|integer',
             'photo' => 'mimes:png,jpeg,jpg|max:5048|nullable'
 
         ]);
@@ -37,7 +37,7 @@ class Blogs extends Controller
                 $obj = Blog::create([
                     'title' => $request->title,
                     'body_text' => $request->body,
-                    'user_id' => $request->user_id,
+                    'user_id' => 1,//$request->user_id,
                     'photo' => $fileName,
                     'file_path' => $file_path,
                 ]);

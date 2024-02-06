@@ -1,13 +1,17 @@
 import { Link, useSubmit } from "react-router-dom";
+import {  toast } from 'react-toastify';
 
 function BlogItem({ blog }) {
   const submit = useSubmit();
 
   function startDeleteHandler() {
-    const proceed = window.confirm("Are you sure you want to delete this blog item?");
-    if (proceed) {
-      submit(null, { method: "delete",} );
-    }
+    toast.error("Wow so easy !",{
+      theme: "colored"
+    });
+    // const proceed = window.confirm("Are you sure you want to delete this blog item?");
+    // if (proceed) {
+    //   submit(null, { method: "delete",} );
+    // }
   }
 
   return (
