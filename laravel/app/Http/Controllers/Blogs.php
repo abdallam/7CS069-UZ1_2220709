@@ -17,16 +17,15 @@ class Blogs extends Controller
 
     public function create(Request $request)
     {
-        
+       
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255|min:5',
             'body' => 'required',
-          //  'user_id' => 'required|integer',
+           // 'user_id' => 'required|integer',
             'photo' => 'mimes:png,jpeg,jpg|max:5048|nullable'
 
         ]);
         if ($validator->errors()->isEmpty()) {
-
             try {
                 if ($request->file()) {
                     $fileName = Str::uuid() . '.' . $request->photo->getClientOriginalExtension();
@@ -38,9 +37,9 @@ class Blogs extends Controller
                     'title' => $request->title,
                     'body_text' => $request->body,
                     'user_id' => 1,//$request->user_id,
-                    'photo' => $fileName,
-                    'file_path' => $file_path,
-                ]);
+                    'photo' => $fileName ?? null,
+                    'file_path' => $file_path ?? null,
+            ]);
 
                 if ($obj) {
                     $this->output["message"] = 'success';
@@ -55,8 +54,7 @@ class Blogs extends Controller
             }
         } else {
             $this->output["error"] = 1;
-            $this->output["message"] = 'fail';
-            $this->output["data"] = $validator->errors();
+            $this->output["message"] = $validator->errors()->all();
         }
         return json_encode($this->output);
     }
@@ -66,7 +64,7 @@ class Blogs extends Controller
 
         try {
             //select('id','user_id','title','body_text','photo','created_at')
-            $this->output["data"] = Blog::with('user')->active()->get();
+            $this->output["data"] = Blog::with('user')->active()->orderBy('id', 'DESC')->get();
         } catch (Throwable $e) {
             $this->output["error"] = 1;
             $this->output["message"] = $e->getMessage();
@@ -144,8 +142,7 @@ class Blogs extends Controller
                 return json_encode($this->output);
             } else {
                 $this->output["error"] = 1;
-                $this->output["message"] = 'fail';
-                $this->output["data"] = $validator->errors();
+                $this->output["message"] = $validator->errors();
                 return json_encode($this->output);
             }
         } else {

@@ -2,6 +2,8 @@ import { json, useLoaderData } from "react-router-dom";
 import BlogsList from "../components/BlogsList";
 
 function BlogsPage() {
+  
+  
   const data = useLoaderData();
   return <BlogsList blogs={data} />;
 }

@@ -54,26 +54,14 @@ function BlogForm({ method, blog }) {
   }
 
   return (
-    <div className="container col-md-6">
-    <div className="card  shadow m-5   rounded">
-      <div className="card-header">
+    <div className="container ">
+    <div className="card     border-0">
+      {/* <div className="card-header">
         <h5 > Item Details</h5>
-      </div>
+      </div> */}
       <div className="card-body bg-body">
         <Form method={method} onSubmit={handleSubmit}>
-          <div className="form-group row mb-1 mt-0">
-            <div className="alert  ">
-              {response && response.data && (
-                <ul>
-                  {Object.values(response.data).map((err) => (
-                    <li key={err} className="text-danger fw-bold">
-                      {err}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
+          
           <div className="form-group row mb-1">
             <label htmlFor="title" className="col-sm-2 col-form-label">
               Title <i className="bi bi-asterisk text-danger"></i>
