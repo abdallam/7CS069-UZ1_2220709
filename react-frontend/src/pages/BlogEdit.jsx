@@ -1,6 +1,12 @@
+import {  useRouteLoaderData } from "react-router-dom";
+
+import BlogForm from "../components/BlogForm";
+
 function BlogEditPage()
 {
-return <h1>the details of the blog edit page</h1>;
+    const data = useRouteLoaderData('blog-details');
+    return <BlogForm method={'patch'} blog={data}/>; 
+
 }
 
 export default BlogEditPage;

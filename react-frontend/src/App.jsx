@@ -1,8 +1,11 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import HomePage from "./pages/Home";
-import BlogsPage, {loader as blogsLoader} from "./pages/Blogs";
-import BlogDetailsPage from "./pages/BlogDetails";
-import BlogNewPage from "./pages/BlogNew";
+import BlogsPage, { loader as blogsLoader } from "./pages/Blogs";
+import BlogDetailsPage, {
+  loader as blogLoader,
+  action as deleteBlogAction,
+} from "./pages/BlogDetails";
+import BlogNewPage, { action as newBlogAction } from "./pages/BlogNew";
 import BlogEditPage from "./pages/BlogEdit";
 import RootLayout from "./pages/Root";
 import ErrorPage from "./pages/Error";
@@ -24,15 +27,31 @@ const router = createBrowserRouter([
       },
       {
         path: "blogs/show/:blogId",
-        element: <BlogDetailsPage />,
+        // element: <BlogDetailsPage />,
+        id: "blog-details",
+        loader: blogLoader,
+        children: [
+          {
+            index: true,
+            element: <BlogDetailsPage />,
+            action: deleteBlogAction,
+          },
+          {
+            path: "edit",
+            element: <BlogEditPage />,
+            // action: manipulateEventAction,
+          },
+        ],
       },
       {
-        path: "blogs/new",
+        path: "new",
         element: <BlogNewPage />,
+        action: newBlogAction,
+
       },
       {
-        path: "blogs/edit/:blogId",
-        element: <BlogEditPage />,
+        path: "save",
+        action: newBlogAction,
       },
     ],
   },

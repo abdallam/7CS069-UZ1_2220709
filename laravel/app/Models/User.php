@@ -48,6 +48,10 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
+    public function getPhotoAttribute($value)
+    {
+        return 'http://localhost:8000/storage/profiles/'.$value;
+    }
     public function scopeActive($query)
     {
         return $query->where('alive', 1);

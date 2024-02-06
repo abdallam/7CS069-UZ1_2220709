@@ -4,8 +4,9 @@ function MainNavigation() {
   return (
     <nav  className="navbar navbar-expand-lg bg-primary navbar-dark ">
     <div className="container-fluid">
+
         <span className="navbar-brand fw-bold" >
-           Blogging
+        <i className="bi bi-bootstrap"></i>   Blogging
         </span>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMnu" aria-controls="navbarMnu" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon navbaricon"></span>

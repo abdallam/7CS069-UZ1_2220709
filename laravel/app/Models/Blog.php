@@ -24,13 +24,17 @@ class Blog extends Model
         'updated_at' => 'datetime:M-d-Y H:i',
 
     ];
+    public function getPhotoAttribute($value)
+    {
+        return 'http://localhost:8000/storage/blogs/'.$value;
+    }
     public function scopeActive($query)
     {
         return $query->where('alive', 1);
     }
     public function user()
     {
-        return $this->belongsTo(User::class)->select(['id','name','email','file_path']);
+        return $this->belongsTo(User::class)->select(['id','name','email','photo']);
 
     }
 }

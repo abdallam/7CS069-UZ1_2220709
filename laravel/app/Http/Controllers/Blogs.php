@@ -19,10 +19,10 @@ class Blogs extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|min:5',
             'body' => 'required',
             'user_id' => 'required|integer',
-            'photo' => 'mimes:png,jpeg,jpg|max:5048'
+            'photo' => 'mimes:png,jpeg,jpg|max:5048|nullable'
 
         ]);
         if ($validator->errors()->isEmpty()) {
@@ -65,7 +65,8 @@ class Blogs extends Controller
     {
 
         try {
-            $this->output["data"] = Blog::active()->get();
+            //select('id','user_id','title','body_text','photo','created_at')
+            $this->output["data"] = Blog::with('user')->active()->get();
         } catch (Throwable $e) {
             $this->output["error"] = 1;
             $this->output["message"] = $e->getMessage();
