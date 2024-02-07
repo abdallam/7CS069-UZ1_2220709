@@ -27,7 +27,6 @@ export async function loader({ request, params }) {
 export async function action({ request, params }) {
     
 const id= params.blogId;
-  console.log(id);
 
   const response = await fetch("http://localhost:8000/api/blog/delete/"+id, {
     method: "POST",

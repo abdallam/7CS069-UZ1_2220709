@@ -1,17 +1,14 @@
-import { Link, useSubmit } from "react-router-dom";
-import {  toast } from 'react-toastify';
+import { Link, useSubmit  } from "react-router-dom";
 
 function BlogItem({ blog }) {
   const submit = useSubmit();
 
   function startDeleteHandler() {
-    toast.error("Wow so easy !",{
-      theme: "colored"
-    });
-    // const proceed = window.confirm("Are you sure you want to delete this blog item?");
-    // if (proceed) {
-    //   submit(null, { method: "delete",} );
-    // }
+    
+    const proceed = window.confirm("Are you sure you want to delete this blog item?");
+    if (proceed) {
+      submit(null, { method: "delete",} );
+    }
   }
 
   return (
@@ -21,13 +18,17 @@ function BlogItem({ blog }) {
         width={100}
         height={250}
         className="card-img-top"
-        alt={blog.photo}
+        alt=""
       />
       <div className="card-header row">
         <div className="card-title col">
           <h5>{blog.title}</h5>
         </div>
         <div className="col input-group justify-content-end">
+        <Link className="btn btn-sm  m-1 btn-secondary rounded" to="/blogs">
+        <i className="bi bi-arrow-left"></i> Back
+          </Link>
+        
           <Link className="btn btn-sm  m-1 btn-warning rounded" to="edit">
             <i className="bi bi-pencil-square"></i> Edit
           </Link>
@@ -54,16 +55,7 @@ function BlogItem({ blog }) {
       </div>
     </div>
 
-    // <article classNameName=''>
-    //   <img src={blog.image} alt={blog.title} />
-    //   <h1>{blog.title}</h1>
-    //   <time>{blog.created_at}</time>
-    //   <p>{blog.body_text}</p>
-    //   <menu classNameName=''>
-    //     <Link to="edit">Edit</Link>
-    //     <button onClick={startDeleteHandler}>Delete</button>
-    //   </menu>
-    // </article>
+   
   );
 }
 

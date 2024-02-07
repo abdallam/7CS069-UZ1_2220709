@@ -3,138 +3,147 @@ import {
   useNavigate,
   useNavigation,
   useActionData,
-  useSubmit,
-  json,
   redirect,
 } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "axios";
 
 function BlogForm({ method, blog }) {
   const response = useActionData();
   const navigate = useNavigate();
   const navigation = useNavigation();
-  const submit = useSubmit();
 
   const isSubmitting = navigation.state === "submitting";
 
   function handleSubmit(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = {
-      title: formData.get("title"),
-      body: formData.get("body"),
-      photo: formData.get("photo"),
-      user_id: 1,
-    };
 
-    console.log(data);
-    //      submit(data, {
-    //     method: "post",
-
-    //  });
     axios
-      .postForm("http://localhost:8000/api/blogs/create", event.target)
+      .postForm("http://localhost:8000/api/update", event.target)
       .then((response) => {
         console.log(response.data);
         if (response.data.error === 1) {
-          console.log(response.data.data);
-         window.alert('Some error happened');
-        } 
-        if (response.data.error === 0) window.alert('Success'); 
+          const errors = response.data.message;
+
+          if (Array.isArray(errors)) {
+            for (let i = 0; i < errors.length; i++) {
+              toast.error(errors[i], {
+                theme: "colored",
+              });
+            }
+          } else {
+            toast.error(errors, {
+              theme: "colored",
+            });
+          }
+        } else if (response.data.error === 0) {
+         // redirect("/blogs/show/" + response.data.data);
+          toast.success("Success", {
+            theme: "colored",
+          });
+        } else {
+          toast.error("An error occured.", {
+            theme: "colored",
+          });
+        }
       })
       .catch((error) => {
         console.log(error);
+        toast.error("Something went wrong!!", {
+          theme: "colored",
+        });
       });
-
-
   }
 
-  function cancelHandler() {
-    navigate("/blogs");
+  function cancelHandler(id) {
+    navigate("/blogs/show/" + id);
   }
 
   return (
     <div className="container ">
-    <div className="card     border-0">
-      {/* <div className="card-header">
-        <h5 > Item Details</h5>
-      </div> */}
-      <div className="card-body bg-body">
-        <Form method={method} onSubmit={handleSubmit}>
-          
-          <div className="form-group row mb-1">
-            <label htmlFor="title" className="col-sm-2 col-form-label">
-              Title <i className="bi bi-asterisk text-danger"></i>
-            </label>
-            <div className="col-sm-10">
-              <input
-                type="text"
-                className="form-control"
-                id="title"
-                name="title"
-                required
-                minLength={5}
-                autoFocus
-                placeholder=" Blog item title"
-                defaultValue={blog ? blog.title : ""}
-              />
+      <div className="card     border-0">
+        <div className="card-body bg-body">
+          <Form method={method} onSubmit={handleSubmit}>
+            <input
+              type="hidden"
+              className="form-control"
+              id="blogID"
+              name="blogID"
+              defaultValue={blog ? blog.id : 0}
+            />
+            <div className="form-group row mb-1">
+              <label htmlFor="title" className="col-sm-2 col-form-label">
+                Title
+              </label>
+              <div className="col-sm-10">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="title"
+                  name="title"
+                  required
+                  minLength={5}
+                  autoFocus
+                  placeholder=" Blog item title"
+                  defaultValue={blog ? blog.title : ""}
+                />
+              </div>
+            </div>
+            <div className="form-group row mb-1">
+              <label htmlFor="image" className="col-sm-2 col-form-label">
+                Image
+              </label>
+              <div className="col-sm-10">
+                <input
+                  type="file"
+                  className="form-control"
+                  id="photo"
+                  name="photo"
+                />
+              </div>
+            </div>
+            <div className="form-group row mb-1">
+              <label htmlFor="description" className="col-sm-2 col-form-label">
+                Body
+              </label>
+              <div className="col-sm-10">
+                <textarea
+                  className="form-control"
+                  rows="10"
+                  id="body"
+                  name="body"
+                  placeholder="Blog item body ..."
+                  required
+                  minLength={10}
+                  defaultValue={blog ? blog.body_text : ""}
+                ></textarea>
+              </div>
             </div>
 
-         
-          </div>
-          <div className="form-group row mb-1">
-               <label htmlFor="image" className="col-sm-2 col-form-label">
-               Image <span className="text-danger"></span>{" "}
-            </label>
-            <div className="col-sm-10">
-              <input
-                type="file"
-                className="form-control"
-                id="photo"
-                name="photo"
-              />
-            </div></div>
-          <div className="form-group row mb-1">
-            <label htmlFor="description" className="col-sm-2 col-form-label">
-              Body
-            </label>
-            <div className="col-sm-10">
-              <textarea
-                className="form-control"
-                rows="10"
-                id="body"
-                name="body"
-                placeholder="Blog item body ..."
-                required
-                minLength={10}
-                defaultValue={blog ? blog.body_text : ""}
-              ></textarea>
-            </div>
-          </div>
+            <div className="col-sm-12 ">
+              <button
+                className="btn btn-primary  m-1 float-end"
+                id="savebtn"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                <i className="bi bi-save"></i>{" "}
+                {isSubmitting ? "Submitting..." : "Save"}
+              </button>
 
-          <div className="col-sm-12 ">
-            <button
-              className="btn btn-success btn-sm rounded m-1 float-end"
-              id="savebtn"
-              type="submit"
-              disabled={isSubmitting}
-            >
-              <i className="bi bi-save"></i>{" "}
-              {isSubmitting ? "Submitting..." : "Save"}
-            </button>
-            <button
-              className="btn btn-danger btn-sm rounded m-1 float-end"
-              id="cancelBtn"
-              type="button"
-              onClick={cancelHandler}
-              disabled={isSubmitting}
-            >
-              <i className="bi bi-x-square"></i> Cancel
-            </button>
-          </div>
-        </Form>
+              <button
+                className="btn btn-secondary  m-1 float-end"
+                id={blog.id}
+                type="button"
+                onClick={(e) => cancelHandler(e.target.id)}
+                disabled={isSubmitting}
+              >
+                <i className="bi bi-x-circle"></i> Cancel
+              </button>
+            </div>
+          </Form>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

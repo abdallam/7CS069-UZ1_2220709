@@ -47,16 +47,7 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "new",
-        element: <BlogNewPage />,
-        action: BlogFormAction,
-
-      },
-      {
-        path: "save",
-        action: BlogFormAction,
-      },
+    
     ],
   },
 ]);

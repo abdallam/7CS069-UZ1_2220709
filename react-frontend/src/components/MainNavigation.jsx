@@ -22,9 +22,7 @@ function MainNavigation() {
                 <li className="nav-item">
                     <NavLink className="nav-link fw-bold"  to="/blogs">Blogs</NavLink>
                 </li>
-                <li className="nav-item">
-                    <NavLink className="nav-link fw-bold"  to="/new">Add</NavLink>
-                </li>
+             
                 <li className="nav-item">
                     <NavLink className="nav-link fw-bold" to='logout.php' id='logout' title='Log out'>Logout</NavLink>
                 </li>

@@ -47,7 +47,7 @@ Route::post('/users/login', [Users::class, 'login'])
         Route::post('/blog/{id}', 'show');
         Route::get('/blogs', 'get');
         Route::post('/blogs/create', 'create');
-        Route::post('/blog/update/{id}', 'update');
+        Route::post('/update', 'update');
         Route::post('/blog/delete/{id}', 'delete');
     });
 //});

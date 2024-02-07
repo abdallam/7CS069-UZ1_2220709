@@ -17,17 +17,18 @@ class Blogs extends Controller
 
     public function create(Request $request)
     {
-       
+
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255|min:5',
-            'body' => 'required',
-           // 'user_id' => 'required|integer',
-            'photo' => 'mimes:png,jpeg,jpg|max:5048|nullable'
+            'body' => 'required|min:5',
+            // 'user_id' => 'required|integer',
+            'photo' => 'required|mimes:png,jpeg,jpg|max:5048'
 
         ]);
         if ($validator->errors()->isEmpty()) {
             try {
-                if ($request->file()) {
+                if ($request->file('photo')) {
                     $fileName = Str::uuid() . '.' . $request->photo->getClientOriginalExtension();
                     $filePath = $request->file('photo')->storeAs('blogs', $fileName, 'public');
                     $file_path =  $filePath;
@@ -36,10 +37,10 @@ class Blogs extends Controller
                 $obj = Blog::create([
                     'title' => $request->title,
                     'body_text' => $request->body,
-                    'user_id' => 1,//$request->user_id,
+                    'user_id' => 1, //$request->user_id,
                     'photo' => $fileName ?? null,
                     'file_path' => $file_path ?? null,
-            ]);
+                ]);
 
                 if ($obj) {
                     $this->output["message"] = 'success';
@@ -56,7 +57,9 @@ class Blogs extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = $validator->errors()->all();
         }
-        return json_encode($this->output);
+
+
+        return response(json_encode($this->output), 200);
     }
 
     public function get()
@@ -64,14 +67,13 @@ class Blogs extends Controller
 
         try {
             //select('id','user_id','title','body_text','photo','created_at')
-            $this->output["data"] = Blog::with('user')->active()->orderBy('id', 'DESC')->get();
+            $this->output["data"] = Blog::with('user')->active()->orderBy('id', 'desc')->get();
         } catch (Throwable $e) {
             $this->output["error"] = 1;
             $this->output["message"] = $e->getMessage();
             $this->output["code"] = $e->getCode();
         }
-
-        return json_encode($this->output);
+        return response(json_encode($this->output), 200);
     }
 
     public function show($param)
@@ -89,67 +91,66 @@ class Blogs extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = 'Invalid ID';
         }
-        return json_encode($this->output);
+        return response(json_encode($this->output), 200);
     }
-    public function update($param, Request $request)
+    public function update(Request $request)
     {
-        $id = (int) $param;
-        if (is_int($id) && $id > 0) {
+        // $this->output["error"] = 1;
+        // $this->output["data"] = $request->all();
+        // return response( json_encode($this->output),200);
 
-            $validator = Validator::make($request->all(), [
-                'title' => 'required|string',
-                'body' => 'required',
-                'photo' => 'mimes:png,jpeg,jpg|max:5048'
+        $validator = Validator::make($request->all(), [
+            'blogID' => 'required|integer',
+            'title' => 'required|string',
+            'body' => 'required',
+            'photo' => 'mimes:png,jpeg,jpg|max:5048|nullable'
 
-            ]);
-            if ($validator->errors()->isEmpty()) {
+        ]);
+        if ($validator->errors()->isEmpty()) {
 
-                try {
+            try {
+                $fileName = null;
+                $file_path = null;
+                $old = Blog::findOrFail($request->blogID);
 
-                    $old = Blog::findOrFail($id);
+                if ($request->file('photo')) {
 
-                    if ($request->file()) {
-
-                        if (Storage::disk('public')->exists($old->file_path)) {
-                            Storage::disk('public')->delete($old->file_path);
-                        }
-
-                        $fileName = Str::uuid() . '.' . $request->photo->getClientOriginalExtension();
-                        $filePath = $request->file('photo')->storeAs('blogs', $fileName, 'public');
-                        $file_path = $filePath;
+                    if (Storage::disk('public')->exists($old->file_path)) {
+                        Storage::disk('public')->delete($old->file_path);
                     }
 
-                    $obj = Blog::where('id', $id)->update([
-                        'title' => $request->title,
-                        'body_text' => $request->body,
-                        'photo' => $fileName ?? null,
-                        'file_path' => $file_path ?? null,
-                        'alive' => 1,
-
-                    ]);
-
-                    if ($obj)    $this->output["message"] = 'success';
-                    else {
-                        $this->output["error"] = 1;
-                        $this->output["message"] = 'unable to update';
-                    }
-                } catch (Throwable $e) {
-                    $this->output["error"] = 1;
-                    $this->output["message"] = $e->getMessage();
-                    $this->output["code"] = $e->getCode();
+                    $fileName = Str::uuid() . '.' . $request->photo->getClientOriginalExtension();
+                    $file_path = $request->file('photo')->storeAs('blogs', $fileName, 'public');
                 }
+                 
 
-                return json_encode($this->output);
-            } else {
+                $obj = Blog::where('id',  $old->id)->update([
+                    'title' => $request->title,
+                    'body_text' => $request->body,
+                    'photo' =>  is_null($fileName) ? Str::after($old->file_path , 'blogs/') : $fileName,
+                    'file_path' => is_null($file_path) ? $old->file_path : $file_path,
+                    'alive' => 1,
+
+                ]);
+
+                if ($obj) {
+                    $this->output["message"] = 'success';
+                    $this->output["data"] = $old->id;
+                } else {
+                    $this->output["error"] = 1;
+                    $this->output["message"] = 'unable to update';
+                }
+            } catch (Throwable $e) {
                 $this->output["error"] = 1;
-                $this->output["message"] = $validator->errors();
-                return json_encode($this->output);
+                $this->output["message"] = $e->getMessage();
+                $this->output["code"] = $e->getCode();
             }
         } else {
             $this->output["error"] = 1;
-            $this->output["message"] = 'Invalid ID';
+            $this->output["message"] = $validator->errors()->all();
         }
-        return json_encode($this->output);
+
+        return response(json_encode($this->output), 200);
     }
     public function delete($param)
     {
@@ -170,6 +171,6 @@ class Blogs extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = 'Invalid ID';
         }
-        return json_encode($this->output);
+        return response(json_encode($this->output), 200);
     }
 }

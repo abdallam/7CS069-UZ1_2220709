@@ -1,18 +1,16 @@
+import { Link, Form, useNavigation, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-import { Link, Form, useNavigation } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 function BlogsList({ blogs }) {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const handleSave = () => {
-    window.alert("save");
-  };
 
+  const navigate = useNavigate();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
@@ -22,23 +20,27 @@ function BlogsList({ blogs }) {
     axios
       .postForm("http://localhost:8000/api/blogs/create", event.target)
       .then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         if (response.data.error === 1) {
-          console.log(response.data.message);
-          const errors=response.data.message;
-          for (let i = 0; i < errors.length; i++) {
-            toast.error(
-               errors[i] ,
-              {
+          const errors = response.data.message;
+          if (Array.isArray(errors)) {
+            for (let i = 0; i < errors.length; i++) {
+              toast.error(errors[i], {
                 theme: "colored",
-              }
-            );
-          }
-        }      
-
-        if (response.data.error === 0) {
+              });
+            }
+          } else
+            toast.error(errors, {
+              theme: "colored",
+            });
+        } else if (response.data.error === 0) {
           setShow(false);
+          navigate("/blogs");
           toast.success("Success", {
+            theme: "colored",
+          });
+        } else {
+          toast.error("An error occured.", {
             theme: "colored",
           });
         }
@@ -54,10 +56,10 @@ function BlogsList({ blogs }) {
     <div className="card">
       <div className="card-header">
         <button
-          className="btn btn-sm btn-primary rounded m-1 float-end"
+          className="btn  btn-primary  m-1 float-end"
           onClick={handleShow}
         >
-          <i className="bi bi-plus-lg"></i> Add new blog
+          <i className="bi bi-plus-lg"></i> Create Blog
         </button>
       </div>
       <div className="card-body bg-body">
@@ -102,7 +104,7 @@ function BlogsList({ blogs }) {
         dialogClassName="modal-90w"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Blog Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {/* <BlogForm method={"post"} /> */}
@@ -118,21 +120,22 @@ function BlogsList({ blogs }) {
                   className="form-control"
                   id="title"
                   name="title"
-                  
                   minLength={5}
                   autoFocus
-                  placeholder=" Blog item title"
+                  required
+                  placeholder=" Please add a title"
                   // defaultValue={blog ? blog.title : ""}
                 />
               </div>
             </div>
             <div className="form-group row mb-1">
               <label htmlFor="image" className="col-sm-2 col-form-label">
-                Image <span className="text-danger"></span>{" "}
+                Image <i className="bi bi-asterisk text-danger"></i>
               </label>
               <div className="col-sm-10">
                 <input
                   type="file"
+                  required
                   className="form-control"
                   id="photo"
                   name="photo"
@@ -141,7 +144,7 @@ function BlogsList({ blogs }) {
             </div>
             <div className="form-group row mb-1">
               <label htmlFor="description" className="col-sm-2 col-form-label">
-                Body
+                Body <i className="bi bi-asterisk text-danger"></i>
               </label>
               <div className="col-sm-10">
                 <textarea
@@ -149,8 +152,8 @@ function BlogsList({ blogs }) {
                   rows="10"
                   id="body"
                   name="body"
-                  placeholder="Blog item body ..."
-                  
+                  required
+                  placeholder=" body ..."
                   minLength={10}
                   //  defaultValue={blog ? blog.body_text : ""}
                 ></textarea>
@@ -158,7 +161,7 @@ function BlogsList({ blogs }) {
             </div>
             <div className="col-sm-12 ">
               <button
-                className="btn btn-success btn-sm rounded m-1 float-end"
+                className="btn btn-primary   m-1 float-end"
                 id="savebtn"
                 type="submit"
                 disabled={isSubmitting}
@@ -167,13 +170,13 @@ function BlogsList({ blogs }) {
                 {isSubmitting ? "Submitting..." : "Save"}
               </button>
               <button
-                className="btn btn-danger btn-sm rounded m-1 float-end"
+                className="btn btn-secondary   m-1 float-end"
                 id="cancelBtn"
                 type="button"
                 onClick={handleClose}
                 disabled={isSubmitting}
               >
-                <i className="bi bi-x-square"></i> Cancel
+                <i className="bi bi-x-circle"></i> Cancel
               </button>
             </div>
           </Form>
