@@ -21,7 +21,7 @@ function BlogForm({ method, blog }) {
     axios
       .postForm("http://localhost:8000/api/update", event.target)
       .then((response) => {
-        console.log(response.data);
+       // console.log(response.data);
         if (response.data.error === 1) {
           const errors = response.data.message;
 
@@ -37,10 +37,13 @@ function BlogForm({ method, blog }) {
             });
           }
         } else if (response.data.error === 0) {
-         // redirect("/blogs/show/" + response.data.data);
-          toast.success("Success", {
-            theme: "colored",
-          });
+
+          // redirect ("/blogs/show/" + response.data.data);
+           navigate ("/blogs/show/" + response.data.data);
+          navigate(0);
+          // toast.success("Success", {
+          //   theme: "colored",
+          // });
         } else {
           toast.error("An error occured.", {
             theme: "colored",
@@ -150,27 +153,5 @@ function BlogForm({ method, blog }) {
 
 export default BlogForm;
 
-export async function action({ request, params }) {
-  //window.alert('here');
-  const data = await request.formData();
 
-  //Object.fromEntries(await request.formData());
 
-  //   const blogData = { title: data.get("title"),body: data.get("body"),photo: data.get("image") };
-  //const send = JSON.stringify(data);
-  //multipart/form-data
-
-  const response = fetch("http://localhost:8000/api/blogs/create", {
-    method: "POST",
-    headers: { "Content-Type": "multipart/form-data" },
-    body: data,
-  });
-
-  const res = await response.json();
-  console.log("im" + res);
-
-  // if (res.error === 1) {
-  //   console.log(res.data);
-  //   return response;
-  // } else return redirect("/blogs");
-}

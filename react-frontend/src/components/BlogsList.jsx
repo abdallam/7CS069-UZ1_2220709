@@ -6,10 +6,16 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 function BlogsList({ blogs }) {
   const [show, setShow] = useState(false);
+  const [blog, setBlog] = useState(null);
+  const [flag, setFlag] = useState(false);
+  const [record, setRecord] = useState(0);
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
+  function handleShow() {
+    setBlog(null);
+    setShow(true);
+    setFlag(false);
+  }
   const navigate = useNavigate();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -17,10 +23,13 @@ function BlogsList({ blogs }) {
   function handleSubmit(event) {
     event.preventDefault();
 
+    let url = "http://localhost:8000/api/blogs/create";
+
+    if (flag) url = "http://localhost:8000/api/blog/update/" + record;
+
     axios
-      .postForm("http://localhost:8000/api/blogs/create", event.target)
+      .postForm(url, event.target)
       .then((response) => {
-        //console.log(response.data);
         if (response.data.error === 1) {
           const errors = response.data.message;
           if (Array.isArray(errors)) {
@@ -47,10 +56,70 @@ function BlogsList({ blogs }) {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went wrong!!", {
+        toast.error(error.message, {
           theme: "colored",
         });
       });
+  }
+
+  function updateHandler(id) {
+    axios
+      .get("http://localhost:8000/api/blog/" + id)
+      .then((response) => {
+        if (response.data.error === 1) {
+          const errors = response.data.message;
+            toast.error(errors, {
+              theme: "colored",
+            });
+        } else if (response.data.error === 0) {
+          setFlag(true);
+          setRecord(id);
+          setBlog(response.data.data);
+          setShow(true);
+        } else {
+          toast.error("An error occured.", {
+            theme: "colored",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(error.message, {
+          theme: "colored",
+        });
+      });
+  }
+
+  function deleteHandler(id) {
+    
+    const proceed = window.confirm("Are you sure you want to delete this blog item?");
+    if (proceed) {
+      axios
+      .post("http://localhost:8000/api/blog/delete/" + id)
+      .then((response) => {
+        if (response.data.error === 1) {
+          const errors = response.data.message;
+            toast.error(errors, {
+              theme: "colored",
+            });
+        } else if (response.data.error === 0) {
+          navigate("/blogs");
+          toast.success("Deleted successfully.", {
+            theme: "colored",
+          });
+        } else {
+          toast.error("An error occured.", {
+            theme: "colored",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(error.message, {
+          theme: "colored",
+        });
+      });
+    }
   }
   return (
     <div className="card">
@@ -74,23 +143,37 @@ function BlogsList({ blogs }) {
               />
 
               <div className="card-body">
-                <h5 className="card-title">{blog.title}</h5>
-                {/* <p className="card-text">{blog.body_text}</p> */}
-                <small className="text-body-secondary">
-                  {" "}
-                  <i className="bi bi-person-circle"></i> {blog.user.name}
-                </small>
-                <br />
-                <small className="text-body-secondary">
-                  {" "}
-                  <i className="bi bi-calendar-check"></i> {blog.created_at}
-                </small>
+                <Link to={`show/${blog.id}`} className="text-decoration-none">
+                  <h5 className="card-title">{blog.title}</h5>
+                  <small className="text-body-secondary">
+                    {" "}
+                    <i className="bi bi-person-circle"></i> {blog.user.name}
+                  </small>
+                  <br />
+                  <small className="text-body-secondary">
+                    {" "}
+                    <i className="bi bi-calendar-check"></i> {blog.created_at}
+                  </small>
+                </Link>
               </div>
               <div className="card-footer bg-light text-center">
-                <Link to={`show/${blog.id}`} className="btn btn-primary btn-sm">
+                {/* <Link to={`show/${blog.id}`} className="btn btn-primary btn-sm">
                   <i className="bi bi-info-circle"></i>
                   <span> More Dedtails </span>
-                </Link>
+                </Link> */}
+                <button
+                  className="btn btn-sm m-1 btn-warning "
+                  onClick={() => updateHandler(blog.id)}
+                >
+                  <i className="bi bi-pencil-square"></i> edit
+                </button>
+                <button
+                  className="btn btn-sm m-1 btn-danger "
+                  onClick={() => deleteHandler(blog.id)}
+
+                >
+                  <i className="bi bi-trash"></i> Delete
+                </button>
               </div>
             </div>
           ))}
@@ -107,12 +190,14 @@ function BlogsList({ blogs }) {
           <Modal.Title>Blog Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* <BlogForm method={"post"} /> */}
+          {/* <BlogForm method={"post"} /> 
+          <i className="bi bi-asterisk text-danger"></i>
 
+          */}
           <Form method="post" onSubmit={handleSubmit}>
             <div className="form-group row mb-1">
               <label htmlFor="title" className="col-sm-2 col-form-label">
-                Title <i className="bi bi-asterisk text-danger"></i>
+                Title
               </label>
               <div className="col-sm-10">
                 <input
@@ -122,20 +207,18 @@ function BlogsList({ blogs }) {
                   name="title"
                   minLength={5}
                   autoFocus
-                  required
                   placeholder=" Please add a title"
-                  // defaultValue={blog ? blog.title : ""}
+                  defaultValue={blog ? blog.title : ""}
                 />
               </div>
             </div>
             <div className="form-group row mb-1">
               <label htmlFor="image" className="col-sm-2 col-form-label">
-                Image <i className="bi bi-asterisk text-danger"></i>
+                Image
               </label>
               <div className="col-sm-10">
                 <input
                   type="file"
-                  required
                   className="form-control"
                   id="photo"
                   name="photo"
@@ -144,7 +227,7 @@ function BlogsList({ blogs }) {
             </div>
             <div className="form-group row mb-1">
               <label htmlFor="description" className="col-sm-2 col-form-label">
-                Body <i className="bi bi-asterisk text-danger"></i>
+                Body
               </label>
               <div className="col-sm-10">
                 <textarea
@@ -152,10 +235,9 @@ function BlogsList({ blogs }) {
                   rows="10"
                   id="body"
                   name="body"
-                  required
                   placeholder=" body ..."
                   minLength={10}
-                  //  defaultValue={blog ? blog.body_text : ""}
+                  defaultValue={blog ? blog.body_text : ""}
                 ></textarea>
               </div>
             </div>
@@ -181,14 +263,6 @@ function BlogsList({ blogs }) {
             </div>
           </Form>
         </Modal.Body>
-        {/* <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save Changes
-          </Button>
-        </Modal.Footer> */}
       </Modal>
     </div>
   );

@@ -3,11 +3,11 @@ import { Link, useSubmit  } from "react-router-dom";
 function BlogItem({ blog }) {
   const submit = useSubmit();
 
-  function startDeleteHandler() {
+  function commentHandler() {
     
-    const proceed = window.confirm("Are you sure you want to delete this blog item?");
+    const proceed = window.confirm("Are you sure you want to comment this blog item?");
     if (proceed) {
-      submit(null, { method: "delete",} );
+    //  submit(null, { method: "delete",} );
     }
   }
 
@@ -29,15 +29,13 @@ function BlogItem({ blog }) {
         <i className="bi bi-arrow-left"></i> Back
           </Link>
         
-          <Link className="btn btn-sm  m-1 btn-warning rounded" to="edit">
-            <i className="bi bi-pencil-square"></i> Edit
-          </Link>
+       
           <button
-            className="btn btn-sm m-1 btn-danger rounded"
-            onClick={startDeleteHandler}
+            className="btn btn-sm m-1 btn-primary rounded"
+            onClick={commentHandler}
           >
             {" "}
-            <i className="bi bi-trash"></i> Delete
+            <i className="bi bi-plus"></i> Comment
           </button>
         </div>
       </div>

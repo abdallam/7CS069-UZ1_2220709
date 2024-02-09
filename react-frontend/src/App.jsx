@@ -1,18 +1,13 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import HomePage from "./pages/Home";
 import BlogsPage, { loader as blogsLoader } from "./pages/Blogs";
-import BlogDetailsPage, {
-  loader as blogLoader,
-  action as deleteBlogAction,
-} from "./pages/BlogDetails";
-import BlogNewPage from "./pages/BlogNew";
-import BlogEditPage from "./pages/BlogEdit";
+import BlogDetailsPage, { loader as blogLoader } from "./pages/BlogDetails";
+//import BlogEditPage from "./pages/BlogEdit";
 import RootLayout from "./pages/Root";
 import ErrorPage from "./pages/Error";
-import { action as BlogFormAction } from  "./components/BlogForm"
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {
@@ -38,29 +33,26 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <BlogDetailsPage />,
-            action: deleteBlogAction,
+            // action: deleteBlogAction,
           },
-          {
-            path: "edit",
-            element: <BlogEditPage />,
-            // action: manipulateEventAction,
-          },
+          // {
+          //   path: "edit",
+          //   element: <BlogEditPage />,
+          // },
         ],
       },
-    
     ],
   },
 ]);
 
 function App() {
-  return       <div>
-  <RouterProvider router={router} />
-  <ToastContainer  />
-  {/* stacked */}
-
-  </div>
-
-  ;
+  return (
+    <div>
+      <RouterProvider router={router} />
+      <ToastContainer />
+      {/* stacked */}
+    </div>
+  );
 }
 
 export default App;

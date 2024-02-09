@@ -24,15 +24,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/users/create', [Users::class, 'create'])
+Route::post('/register', [Users::class, 'create'])
     ->middleware('guest')
     ->name('register');
 
-Route::post('/users/login', [Users::class, 'login'])
+Route::post('/login', [Users::class, 'login'])
     ->middleware('guest')
     ->name('login');
 
-//Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::controller(Users::class)->group(function () {
         Route::post('/user/{id}', 'show');
@@ -44,10 +44,10 @@ Route::post('/users/login', [Users::class, 'login'])
     });
 
     Route::controller(Blogs::class)->group(function () {
-        Route::post('/blog/{id}', 'show');
+        Route::get('/blog/{id}', 'show');
         Route::get('/blogs', 'get');
         Route::post('/blogs/create', 'create');
-        Route::post('/update', 'update');
+        Route::post('/blog/update/{id}', 'update');
         Route::post('/blog/delete/{id}', 'delete');
     });
-//});
+});

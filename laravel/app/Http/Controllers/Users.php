@@ -40,10 +40,9 @@ class Users extends Controller
             }
         } else {
             $this->output["error"] = 1;
-            $this->output["message"] = 'fail';
-            $this->output["data"] = $validator->errors();
+            $this->output["message"] = $validator->errors()->all();
         }
-        return json_encode($this->output);
+        return response($this->output, 200);
     }
 
     public function create(Request $request)
@@ -89,7 +88,7 @@ class Users extends Controller
             $this->output["message"] = 'fail';
             $this->output["data"] = $validator->errors();
         }
-        return json_encode($this->output);
+        return response($this->output, 200);
     }
 
 
@@ -129,7 +128,7 @@ class Users extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = 'Invalid ID';
         }
-        return json_encode($this->output);
+        return response($this->output, 200);
     }
     public function get()
     {
@@ -142,7 +141,7 @@ class Users extends Controller
             $this->output["code"] = $e->getCode();
         }
 
-        return json_encode($this->output);
+        return response($this->output, 200);
     }
 
     public function show($param)
@@ -162,7 +161,7 @@ class Users extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = 'Invalid ID';
         }
-        return json_encode($this->output);
+        return response($this->output, 200);
     }
 
     public function delete($param)
@@ -184,7 +183,7 @@ class Users extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = 'Invalid ID';
         }
-        return json_encode($this->output);
+        return response($this->output, 200);
     }
 
     public function logout(Request $request)
