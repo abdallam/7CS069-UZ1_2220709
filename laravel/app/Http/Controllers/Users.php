@@ -14,12 +14,6 @@ class Users extends Controller
 {
     private $output = ["error" => 0, 'code' => null, 'message' => null, 'data' => null];
 
-    public function test()
-    {
-
-
-        // return User::find($request->user()->id)->blogs()->get();
-    }
 
     public function login(Request $request)
     {
@@ -36,7 +30,11 @@ class Users extends Controller
             } else {
                 $this->output["message"] = 'success';
                 //Str::lower($request->email.'|'.$request->ip())
-                $this->output["data"] = $user->createToken($request->email)->plainTextToken;
+                $this->output["data"] = [
+                    "id"=>$user->id,
+                    "name"=>$user->name,
+                    "token"=>$user->createToken($request->email)->plainTextToken,
+                ];
             }
         } else {
             $this->output["error"] = 1;
@@ -49,27 +47,18 @@ class Users extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|min:5',
             'email' => 'required|email|unique:users',
-            'password' => 'required|max:255',
-            'photo' => 'mimes:png,jpeg,jpg|max:2048'
+            'password' => 'required|max:255|min:6',
 
         ]);
         if ($validator->errors()->isEmpty()) {
 
             try {
-                if ($request->file()) {
-                    $fileName = Str::uuid() . '.' . $request->photo->getClientOriginalExtension();
-                    $filePath = $request->file('photo')->storeAs('profiles', $fileName, 'public');
-                    $file_path =  $filePath;
-                }
-
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
                     'password' => Hash::make($request->password),
-                    'photo' => $fileName,
-                    'file_path' => $file_path,
                 ]);
 
                 if ($user) {
@@ -85,8 +74,7 @@ class Users extends Controller
             }
         } else {
             $this->output["error"] = 1;
-            $this->output["message"] = 'fail';
-            $this->output["data"] = $validator->errors();
+            $this->output["message"] = $validator->errors()->all();
         }
         return response($this->output, 200);
     }
@@ -99,8 +87,7 @@ class Users extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string',
-                'email' => 'required|email',
-                'photo' => 'mimes:png,jpeg,jpg|max:2048'
+                //'email' => 'required|email',
 
             ]);
             if ($validator->errors()->isEmpty()) {
@@ -190,8 +177,15 @@ class Users extends Controller
     {
 
         if ($request->user()->currentAccessToken()->delete()) {
+            $this->output["error"] = 0;
+            $this->output["message"] = 'success';
+            $this->output["data"] = true;
+        } else {
+            $this->output["error"] = 1;
+            $this->output["message"] = 'Fail';
+            $this->output["data"] = false;
+        }
 
-            return true;
-        } else return false;
+        return response($this->output, 200);
     }
 }

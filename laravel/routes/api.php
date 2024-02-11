@@ -16,12 +16,11 @@ use App\Http\Controllers\Blogs;
 |
 */
 
-Route::get('/test', [Users::class, 'test'])
-    ->middleware('guest');
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    if ( is_int($request->user()->id) && ($request->user()->id > 0)) return  1;
+    else return 0;
 });
 
 Route::post('/register', [Users::class, 'create'])
@@ -32,6 +31,8 @@ Route::post('/login', [Users::class, 'login'])
     ->middleware('guest')
     ->name('login');
 
+
+
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::controller(Users::class)->group(function () {
@@ -39,8 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/users', 'get');
         Route::post('/user/update/{id}', 'update');
         Route::post('/user/delete/{id}', 'delete');
-
-        Route::post('/users/logout', 'logout');
+        Route::post('/logout', 'logout');
     });
 
     Route::controller(Blogs::class)->group(function () {

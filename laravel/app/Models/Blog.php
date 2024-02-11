@@ -34,7 +34,7 @@ class Blog extends Model
     }
     public function user()
     {
-        return $this->belongsTo(User::class)->select(['id','name','email','photo']);
+        return $this->belongsTo(User::class)->select(['id','name','email']);
 
     }
 }

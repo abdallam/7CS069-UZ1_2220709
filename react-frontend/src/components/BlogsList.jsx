@@ -5,6 +5,10 @@ import axios from "axios";
 
 import Modal from "react-bootstrap/Modal";
 function BlogsList({ blogs }) {
+  const credentials = JSON.parse(sessionStorage.getItem("credentials"));
+  
+  const [user] = useState(credentials.id);
+
   const [show, setShow] = useState(false);
   const [blog, setBlog] = useState(null);
   const [flag, setFlag] = useState(false);
@@ -19,6 +23,7 @@ function BlogsList({ blogs }) {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  if (!credentials) navigate("/");
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -28,7 +33,9 @@ function BlogsList({ blogs }) {
     if (flag) url = "http://localhost:8000/api/blog/update/" + record;
 
     axios
-      .postForm(url, event.target)
+      .postForm(url, event.target, {
+        headers: { Authorization: "Bearer " + credentials.token },
+      })
       .then((response) => {
         if (response.data.error === 1) {
           const errors = response.data.message;
@@ -64,13 +71,15 @@ function BlogsList({ blogs }) {
 
   function updateHandler(id) {
     axios
-      .get("http://localhost:8000/api/blog/" + id)
+      .get("http://localhost:8000/api/blog/" + id, {
+        headers: { Authorization: "Bearer " + credentials.token },
+      })
       .then((response) => {
         if (response.data.error === 1) {
           const errors = response.data.message;
-            toast.error(errors, {
-              theme: "colored",
-            });
+          toast.error(errors, {
+            theme: "colored",
+          });
         } else if (response.data.error === 0) {
           setFlag(true);
           setRecord(id);
@@ -91,45 +100,52 @@ function BlogsList({ blogs }) {
   }
 
   function deleteHandler(id) {
-    
-    const proceed = window.confirm("Are you sure you want to delete this blog item?");
+    const proceed = window.confirm(
+      "Are you sure you want to delete this blog item?"
+    );
     if (proceed) {
       axios
-      .post("http://localhost:8000/api/blog/delete/" + id)
-      .then((response) => {
-        if (response.data.error === 1) {
-          const errors = response.data.message;
-            toast.error(errors, {
+        .post("http://localhost:8000/api/blog/delete/" + id, {
+          headers: { Authorization: "Bearer " + credentials.token },
+        })
+        .then((response) => {
+          const message = response.data.message;
+          toast.success(message, {
+            theme: "colored",
+          });
+          if (response.data.error === 0) {
+            navigate("/blogs");
+          } else {
+            toast.error("An error occured.", {
               theme: "colored",
             });
-        } else if (response.data.error === 0) {
-          navigate("/blogs");
-          toast.success("Deleted successfully.", {
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error(error.message, {
             theme: "colored",
           });
-        } else {
-          toast.error("An error occured.", {
-            theme: "colored",
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
         });
-      });
     }
   }
   return (
     <div className="card">
       <div className="card-header">
-        <button
-          className="btn  btn-primary  m-1 float-end"
-          onClick={handleShow}
-        >
-          <i className="bi bi-plus-lg"></i> Create Blog
-        </button>
+        <div className="row">
+          <div className="col">
+            {" "}
+            <h5>Welcome {credentials.name}</h5>
+          </div>
+          <div className="col">
+            <button
+              className="btn  btn-primary  m-1 float-end"
+              onClick={handleShow}
+            >
+              <i className="bi bi-plus-lg"></i> Create Blog
+            </button>
+          </div>
+        </div>
       </div>
       <div className="card-body bg-body">
         <div className="row row-cols-1 row-cols-md-5 justify-content-center ">
@@ -161,16 +177,20 @@ function BlogsList({ blogs }) {
                   <i className="bi bi-info-circle"></i>
                   <span> More Dedtails </span>
                 </Link> */}
+
                 <button
                   className="btn btn-sm m-1 btn-warning "
+                  disabled={blog.user.id === user ? true : false}
                   onClick={() => updateHandler(blog.id)}
+                  title="Edit Item"
                 >
                   <i className="bi bi-pencil-square"></i> edit
                 </button>
                 <button
                   className="btn btn-sm m-1 btn-danger "
+                  disabled={blog.user.id === user ? true : false}
                   onClick={() => deleteHandler(blog.id)}
-
+                  title="Delete Item"
                 >
                   <i className="bi bi-trash"></i> Delete
                 </button>

@@ -2,7 +2,6 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import HomePage from "./pages/Home";
 import BlogsPage, { loader as blogsLoader } from "./pages/Blogs";
 import BlogDetailsPage, { loader as blogLoader } from "./pages/BlogDetails";
-//import BlogEditPage from "./pages/BlogEdit";
 import RootLayout from "./pages/Root";
 import ErrorPage from "./pages/Error";
 import { ToastContainer } from "react-toastify";
@@ -26,19 +25,14 @@ const router = createBrowserRouter([
       },
       {
         path: "blogs/show/:blogId",
-        // element: <BlogDetailsPage />,
         id: "blog-details",
         loader: blogLoader,
         children: [
           {
             index: true,
             element: <BlogDetailsPage />,
-            // action: deleteBlogAction,
           },
-          // {
-          //   path: "edit",
-          //   element: <BlogEditPage />,
-          // },
+        
         ],
       },
     ],

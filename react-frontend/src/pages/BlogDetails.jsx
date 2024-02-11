@@ -1,6 +1,6 @@
 import {
   json,
-//  useParams,
+  //  useParams,
   useRouteLoaderData,
   redirect,
 } from "react-router-dom";
@@ -8,7 +8,7 @@ import BlogItem from "../components/BlogItem";
 import { toast } from "react-toastify";
 
 function BlogDetailsPage() {
- // const param = useParams();
+  // const param = useParams();
   const data = useRouteLoaderData("blog-details");
   return <BlogItem blog={data} />;
 }
@@ -16,46 +16,27 @@ function BlogDetailsPage() {
 export default BlogDetailsPage;
 
 export async function loader({ request, params }) {
-  const id = params.blogId;
-  const response = await fetch("http://localhost:8000/api/blog/" + id, {
-    method: "GET",
-  });
-  if (!response.ok) {
-    throw json({ message: response.statusText }, { status: 500 });
-  } else {
-    const res = await response.json();
-    if (res.error === 1) {
-      throw json({ message: res.message }, { status: 500 });
-    } else return res.data;
+  const credentials = JSON.parse(sessionStorage.getItem("credentials"));
+  if (!credentials)
+    throw json(
+      { message: "Illegal Access: Please login to view the page." },
+      { status: 500 }
+    );
+  else {
+    const id = params.blogId;
+    const response = await fetch("http://localhost:8000/api/blog/" + id, {
+      method: "GET",
+
+      headers: { Authorization: "Bearer " + credentials.token },
+    });
+    if (!response.ok) {
+      throw json({ message: response.statusText }, { status: 500 });
+    } else {
+      const res = await response.json();
+      if (res.error === 1) {
+        throw json({ message: res.message }, { status: 500 });
+      } else return res.data;
+    }
   }
 }
 
-export async function action({ request, params }) {
-  /*const id = params.blogId;
-
-  const response = await fetch("http://localhost:8000/api/blog/delete/" + id, {
-    method: "POST",
-  });
-  if (!response.ok) {
-   // throw json({ message: response.statusText }, { status: 500 });
-    toast.error({ message: response.statusText }, {
-      theme: "colored",
-    });
-  } else {
-    const res = await response.json();
-    if (res.error === 1) {
-     // throw json({ message: res.message }, { status: 500 });
-      toast.error({ message: res.message }, {
-        theme: "colored",
-      });
-
-    } else {
-      toast.success("Success", {
-        theme: "colored",
-      });
-
-     return redirect("/blogs");
-
-    }
-  }*/
-}
