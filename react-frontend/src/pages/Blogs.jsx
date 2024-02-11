@@ -3,7 +3,7 @@ import BlogsList from "../components/BlogsList";
 
 function BlogsPage() {
   const data = useLoaderData();
-  return <BlogsList blogs={data} />;
+  return <BlogsList  />;
 }
 
 export default BlogsPage;

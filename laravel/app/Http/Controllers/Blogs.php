@@ -75,6 +75,31 @@ class Blogs extends Controller
         return response($this->output, 200);
     }
 
+    public function search(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'search' => 'required',
+        ]);
+        if ($validator->errors()->isEmpty()) {
+            try {
+                $this->output["data"] =  Blog::with('user')
+                    ->where('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('body_text', 'like', '%' . $request->search . '%')
+                    ->active()
+                    ->get();
+            } catch (Throwable $e) {
+                $this->output["error"] = 1;
+                $this->output["message"] = $e->getMessage();
+                $this->output["code"] = $e->getCode();
+            }
+        } else {
+            $this->output["error"] = 1;
+            $this->output["message"] = $validator->errors()->all();
+        }
+
+        return response($this->output, 200);
+    }
+
     public function show($param)
     {
         $id = (int) $param;
@@ -151,12 +176,14 @@ class Blogs extends Controller
         }
         return response(json_encode($this->output), 200)->header('Content-Type', 'application/json');
     }
-    public function delete($param)
+    public function delete(Request $request)
     {
-        $id = (int) $param;
-        if (is_int($id) && $id > 0) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->errors()->isEmpty()) {
             try {
-                if (Blog::where('id', $id)->update(['alive' => 0]))    $this->output["message"] = 'success';
+                if (Blog::where('id', $request->id)->update(['alive' => 0]))    $this->output["message"] = 'success';
                 else {
                     $this->output["error"] = 1;
                     $this->output["message"] = 'no record found';

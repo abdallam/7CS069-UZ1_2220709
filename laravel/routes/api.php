@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users;
 use App\Http\Controllers\Blogs;
+use App\Http\Controllers\Comments;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/blogs', 'get');
         Route::post('/blogs/create', 'create');
         Route::post('/blog/update/{id}', 'update');
-        Route::post('/blog/delete/{id}', 'delete');
+        Route::post('/blog/delete', 'delete');
+
+        Route::post('/search', 'search');
+
+    });
+
+    Route::controller(Comments::class)->group(function () {
+        Route::get('/comments/{id}', 'get');
+        Route::post('/comment/add', 'create');
+        Route::post('/comment/delete', 'delete');
     });
 });

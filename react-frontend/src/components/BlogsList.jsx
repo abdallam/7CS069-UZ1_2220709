@@ -1,32 +1,66 @@
-import { Link, Form, useNavigation, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import { Link, Form, useNavigate, json } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 import Modal from "react-bootstrap/Modal";
-function BlogsList({ blogs }) {
+function BlogsList() {
   const credentials = JSON.parse(sessionStorage.getItem("credentials"));
-  
-  const [user] = useState(credentials.id);
+  const navigate = useNavigate();
+  if (!credentials) navigate("/");
+  const [loading, setLoading] = useState(false);
 
+  const [blogs, setBlogs] = useState([]);
+  const [user] = useState(credentials.id);
   const [show, setShow] = useState(false);
   const [blog, setBlog] = useState(null);
   const [flag, setFlag] = useState(false);
   const [record, setRecord] = useState(0);
 
+  useEffect(() => {
+    setLoading(true);
+    getBlogs();
+  }, []);
+
+  function getBlogs() {
+    axios
+      .get("http://localhost:8000/api/blogs", {
+        headers: { Authorization: "Bearer " + credentials.token },
+      })
+      .then((response) => {
+        setLoading(false);
+
+        if (response.data.error === 1) {
+          const errors = response.data.message;
+          toast.error(errors, {
+            theme: "colored",
+          });
+        } else if (response.data.error === 0) {
+          setBlogs(response.data.data);
+        } else {
+          setLoading(false);
+          toast.error("An error occured.", {
+            theme: "colored",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(error.message, {
+          theme: "colored",
+        });
+      });
+  }
   const handleClose = () => setShow(false);
   function handleShow() {
     setBlog(null);
     setShow(true);
     setFlag(false);
   }
-  const navigate = useNavigate();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
-  if (!credentials) navigate("/");
 
   function handleSubmit(event) {
     event.preventDefault();
+    document.getElementById("saveBtn").disabled = true;
 
     let url = "http://localhost:8000/api/blogs/create";
 
@@ -37,6 +71,8 @@ function BlogsList({ blogs }) {
         headers: { Authorization: "Bearer " + credentials.token },
       })
       .then((response) => {
+        document.getElementById("saveBtn").disabled = false;
+
         if (response.data.error === 1) {
           const errors = response.data.message;
           if (Array.isArray(errors)) {
@@ -51,7 +87,8 @@ function BlogsList({ blogs }) {
             });
         } else if (response.data.error === 0) {
           setShow(false);
-          navigate("/blogs");
+          //navigate("/blogs");
+          getBlogs();
           toast.success("Success", {
             theme: "colored",
           });
@@ -62,6 +99,8 @@ function BlogsList({ blogs }) {
         }
       })
       .catch((error) => {
+        document.getElementById("saveBtn").disabled = false;
+
         console.log(error);
         toast.error(error.message, {
           theme: "colored",
@@ -105,16 +144,21 @@ function BlogsList({ blogs }) {
     );
     if (proceed) {
       axios
-        .post("http://localhost:8000/api/blog/delete/" + id, {
-          headers: { Authorization: "Bearer " + credentials.token },
-        })
+        .post(
+          "http://localhost:8000/api/blog/delete",
+          { id: id },
+          {
+            headers: { Authorization: "Bearer " + credentials.token },
+          }
+        )
         .then((response) => {
           const message = response.data.message;
           toast.success(message, {
             theme: "colored",
           });
           if (response.data.error === 0) {
-            navigate("/blogs");
+            // navigate("/blogs");
+            getBlogs();
           } else {
             toast.error("An error occured.", {
               theme: "colored",
@@ -129,74 +173,155 @@ function BlogsList({ blogs }) {
         });
     }
   }
+
+  function searchHandler(e) {
+    e.preventDefault();
+    setLoading(true);
+    let text = document.getElementById("search").value;
+    axios
+      .post(
+        "http://localhost:8000/api/search",
+        { search: text },
+        {
+          headers: { Authorization: "Bearer " + credentials.token },
+        }
+      )
+      .then((response) => {
+        console.log(response.data);
+        setLoading(false);
+
+        if (response.data.error === 1) {
+          const errors = response.data.message;
+          if (Array.isArray(errors)) {
+            for (let i = 0; i < errors.length; i++) {
+              toast.error(errors[i], {
+                theme: "colored",
+              });
+            }
+          } else
+            toast.error(errors, {
+              theme: "colored",
+            });
+        } else if (response.data.error === 0) {
+          //  let res=response.data.data;
+          setBlogs(response.data.data);
+        } else {
+          toast.error("An error occured.", {
+            theme: "colored",
+          });
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+
+        console.log(error);
+        toast.error(error.message, {
+          theme: "colored",
+        });
+      });
+  }
+  if (loading) {
+    return <div className="row alert alert-success fw-bold">Loading data...</div>;
+  }
   return (
     <div className="card">
       <div className="card-header">
         <div className="row">
-          <div className="col">
+          <div className="col-4">
             {" "}
             <h5>Welcome {credentials.name}</h5>
           </div>
-          <div className="col">
-            <button
-              className="btn  btn-primary  m-1 float-end"
-              onClick={handleShow}
+          <div className="col-8">
+            <form
+              className="d-flex "
+              role="search"
+              onSubmit={searchHandler}
             >
-              <i className="bi bi-plus-lg"></i> Create Blog
+              <div className="col">
+              <input
+                className="form-control me-2"
+                type="text"
+                id="search"
+                placeholder="Search"
+                aria-label="Search"
+                required
+              />
+              </div>
+              <div className=" input-group col">
+                <button className="btn btn-outline-success " type="submit">
+                  <i className="bi bi-search"></i> Search
+                </button>
+                <button
+                  className="btn btn-outline-danger "
+                  type="reset"
+                  onClick={getBlogs}
+                >
+                  <i className="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button
+              className="btn  btn-outline-primary   "
+              onClick={handleShow}
+              title="Create blog item"
+            >
+              <i className="bi bi-plus-lg"></i> Add
             </button>
+              </div>
+            </form>
           </div>
+         
         </div>
       </div>
       <div className="card-body bg-body">
         <div className="row row-cols-1 row-cols-md-5 justify-content-center ">
-          {blogs.map((blog) => (
-            <div key={blog.id} className="card shadow rounded col m-2 ">
-              <img
-                src={blog.photo}
-                width={100}
-                height={250}
-                className="card-img-top p-2 mt-1"
-              />
+          {blogs.length > 0 ? (
+            blogs.map((blog) => (
+              <div key={blog.id} className="card shadow rounded col m-2 ">
+                <img
+                  src={blog.photo}
+                  width={100}
+                  height={250}
+                  className="card-img-top p-2 mt-1"
+                />
 
-              <div className="card-body">
-                <Link to={`show/${blog.id}`} className="text-decoration-none">
-                  <h5 className="card-title">{blog.title}</h5>
-                  <small className="text-body-secondary">
-                    {" "}
-                    <i className="bi bi-person-circle"></i> {blog.user.name}
-                  </small>
-                  <br />
-                  <small className="text-body-secondary">
-                    {" "}
-                    <i className="bi bi-calendar-check"></i> {blog.created_at}
-                  </small>
-                </Link>
+                <div className="card-body">
+                  <Link to={`show/${blog.id}`} className="text-decoration-none">
+                    <h5 className="card-title">{blog.title}</h5>
+                    <small className="text-body-secondary">
+                      {" "}
+                      <i className="bi bi-person-circle"></i> {blog.user.name}
+                    </small>
+                    <br />
+                    <small className="text-body-secondary">
+                      {" "}
+                      <i className="bi bi-calendar-check"></i> {blog.created_at}
+                    </small>
+                  </Link>
+                </div>
+                <div className="card-footer bg-light text-center btn-group">
+                  <button
+                    className="btn btn-sm m-1 btn-warning  rounded"
+                    disabled={blog.user.id === user ? false : true}
+                    onClick={() => updateHandler(blog.id)}
+                    title="Edit Item"
+                  >
+                    <i className="bi bi-pencil-square"></i> edit
+                  </button>
+                  <button
+                    className="btn btn-sm m-1 btn-danger rounded"
+                    disabled={blog.user.id === user ? false : true}
+                    onClick={() => deleteHandler(blog.id)}
+                    title="Delete Item"
+                  >
+                    <i className="bi bi-trash"></i> Delete
+                  </button>
+                </div>
               </div>
-              <div className="card-footer bg-light text-center">
-                {/* <Link to={`show/${blog.id}`} className="btn btn-primary btn-sm">
-                  <i className="bi bi-info-circle"></i>
-                  <span> More Dedtails </span>
-                </Link> */}
-
-                <button
-                  className="btn btn-sm m-1 btn-warning "
-                  disabled={blog.user.id === user ? true : false}
-                  onClick={() => updateHandler(blog.id)}
-                  title="Edit Item"
-                >
-                  <i className="bi bi-pencil-square"></i> edit
-                </button>
-                <button
-                  className="btn btn-sm m-1 btn-danger "
-                  disabled={blog.user.id === user ? true : false}
-                  onClick={() => deleteHandler(blog.id)}
-                  title="Delete Item"
-                >
-                  <i className="bi bi-trash"></i> Delete
-                </button>
-              </div>
+            ))
+          ) : (
+            <div className="alert bg-danger text-white fw-bold">
+              There are no blog items found.
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -264,19 +389,16 @@ function BlogsList({ blogs }) {
             <div className="col-sm-12 ">
               <button
                 className="btn btn-primary   m-1 float-end"
-                id="savebtn"
+                id="saveBtn"
                 type="submit"
-                disabled={isSubmitting}
               >
-                <i className="bi bi-save"></i>{" "}
-                {isSubmitting ? "Submitting..." : "Save"}
+                <i className="bi bi-save"></i> Save
               </button>
               <button
                 className="btn btn-secondary   m-1 float-end"
                 id="cancelBtn"
                 type="button"
                 onClick={handleClose}
-                disabled={isSubmitting}
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>

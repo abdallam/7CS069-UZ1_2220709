@@ -1,14 +1,11 @@
 import {
   json,
-  //  useParams,
   useRouteLoaderData,
   redirect,
 } from "react-router-dom";
 import BlogItem from "../components/BlogItem";
-import { toast } from "react-toastify";
 
 function BlogDetailsPage() {
-  // const param = useParams();
   const data = useRouteLoaderData("blog-details");
   return <BlogItem blog={data} />;
 }
