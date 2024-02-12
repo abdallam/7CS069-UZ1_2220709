@@ -1,4 +1,4 @@
-import { Form, Link, useSubmit, useParams } from "react-router-dom";
+import { Form, Link, useParams } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
@@ -205,13 +205,13 @@ function BlogItem({ blog }) {
                   {comm.user.name} [{comm.user.email}]
                 </small>
                 <button
-                  className="btn btn-sm btn-danger float-end"
+                  className="btn btn-sm btn-danger rounded float-end"
                   title="Delete Comment"
                   onClick={() => deleteComment(comm.id)}
                   disabled={comm.user.id === user ? false : true}
 
                 >
-                  <i className="bi bi-trash"></i>
+                  <i className="bi bi-trash"></i> Delete
                 </button>
               </div>
               <p> {comm.comment}</p>

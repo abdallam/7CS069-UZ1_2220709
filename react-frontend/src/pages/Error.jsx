@@ -1,10 +1,14 @@
-import { useRouteError } from 'react-router-dom';
+import { useRouteError, Link, useNavigate} from 'react-router-dom';
 import MainNavigation from '../components/MainNavigation';
-
 import PageContent from '../components/PageContent';
 
 function ErrorPage() {
   const error = useRouteError();
+
+  const history = useNavigate();
+  const goBack = () => {
+    history(-1); // Go back to the previous page
+  };
 
   let title =    'An error occurred.';
   let message =  'Something went wrong!';
@@ -24,7 +28,9 @@ function ErrorPage() {
     <>
       <MainNavigation />
       <PageContent title={title}>
-        <div className='alert alert-danger text-danger'>{message}</div>
+        <div className='alert bg-danger text-white fw-bold'>{message}
+       </div>
+       <p>To go back please click <Link onClick={goBack} className=' btn-link'>back</Link> to go to the log in page click <Link to="/">here</Link>.</p>
       </PageContent>
     </>
   );

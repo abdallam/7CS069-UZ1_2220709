@@ -1,13 +1,18 @@
-import { Form, useNavigate} from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
+
 function LoginForm() {
-    const navigate=useNavigate();
+  const navigate = useNavigate();
   function handleSubmit(e) {
     e.preventDefault();
+    document.getElementById("loginBtn").disabled = true;
+
     axios
       .postForm("http://localhost:8000/api/login", e.target)
       .then((response) => {
+        document.getElementById("loginBtn").disabled = false;
+
         if (response.data.error === 1) {
           const errors = response.data.message;
           if (Array.isArray(errors)) {
@@ -21,9 +26,11 @@ function LoginForm() {
               theme: "colored",
             });
         } else if (response.data.error === 0) {
-        
-            sessionStorage.setItem('credentials', JSON.stringify(response.data.data));
-            navigate('/blogs');
+          sessionStorage.setItem(
+            "credentials",
+            JSON.stringify(response.data.data)
+          );
+          navigate("/blogs");
         } else {
           toast.error("An error occured.", {
             theme: "colored",
@@ -31,6 +38,8 @@ function LoginForm() {
         }
       })
       .catch((error) => {
+        document.getElementById("loginBtn").disabled = false;
+
         console.log(error);
         toast.error(error.message, {
           theme: "colored",
@@ -38,9 +47,9 @@ function LoginForm() {
       });
   }
   return (
-    <div className="container ">
-      <div className="card  shadow   border-1">
-        <div className="card-header alert alert-info">
+    <div className="container mt-5">
+      <div className="card  shadow rounded-1 col-md-6 offset-md-3 ">
+        <div className="card-header alert bg-secondary text-white">
           <h5>Please fill out your credentials</h5>
         </div>
         <div className="card-body bg-body">

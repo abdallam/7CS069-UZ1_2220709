@@ -63,11 +63,7 @@ function MainNavigation() {
         <div className="collapse navbar-collapse" id="navbarMnu">
             
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <NavLink className="nav-link fw-bold" to="/" end>
-                Home
-              </NavLink>
-            </li>
+            
             <li className="nav-item">
               <NavLink className="nav-link fw-bold" to="/blogs" end>
                 Blogs

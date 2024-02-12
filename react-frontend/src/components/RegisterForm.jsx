@@ -3,11 +3,13 @@ import { toast } from "react-toastify";
 import axios from "axios";
 function RegisterForm() {
   function handleSubmit(e) {
-
+    document.getElementById("regBtn").disabled = true;
     e.preventDefault();
     axios
       .postForm("http://localhost:8000/api/register", e.target)
       .then((response) => {
+        document.getElementById("regBtn").disabled = false;
+
         if (response.data.error === 1) {
           const errors = response.data.message;
           if (Array.isArray(errors)) {
@@ -32,6 +34,7 @@ function RegisterForm() {
         }
       })
       .catch((error) => {
+        document.getElementById("regBtn").disabled = false;
         console.log(error);
         toast.error(error.message, {
           theme: "colored",
@@ -39,16 +42,16 @@ function RegisterForm() {
       });
   }
   return (
-    <div className="container ">
-      <div className="card  shadow   border-1">
-        <div className="card-header alert alert-info">
+    <div className="container mt-5">
+      <div className="card  shadow rounded-1 col-md-6 offset-md-3 ">
+        <div className="card-header alert bg-secondary text-white">
           <h5>Please fill out your details</h5>
         </div>
         <div className="card-body bg-body">
           <Form method="post" onSubmit={handleSubmit}>
             <div className="form-group row mb-1">
               <label htmlFor="name" className="col-sm-2 col-form-label">
-                Full Name
+                Name
               </label>
               <div className="col-sm-10">
                 <input

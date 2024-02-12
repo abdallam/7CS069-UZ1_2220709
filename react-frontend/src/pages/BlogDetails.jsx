@@ -1,7 +1,6 @@
 import {
   json,
   useRouteLoaderData,
-  redirect,
 } from "react-router-dom";
 import BlogItem from "../components/BlogItem";
 
