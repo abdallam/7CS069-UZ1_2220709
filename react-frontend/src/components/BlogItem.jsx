@@ -204,15 +204,17 @@ function BlogItem({ blog }) {
                   {" "}
                   {comm.user.name} [{comm.user.email}]
                 </small>
-                <button
+
+                {comm.user.id === user ? <button
                   className="btn btn-sm btn-danger rounded float-end"
                   title="Delete Comment"
                   onClick={() => deleteComment(comm.id)}
-                  disabled={comm.user.id === user ? false : true}
+                  // disabled={comm.user.id === user ? false : true}
 
                 >
                   <i className="bi bi-trash"></i> Delete
-                </button>
+                </button> :  ""}
+               
               </div>
               <p> {comm.comment}</p>
               <hr />

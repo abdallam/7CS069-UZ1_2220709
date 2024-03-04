@@ -1,36 +1,44 @@
-import { useRouteError, Link, useNavigate} from 'react-router-dom';
-import MainNavigation from '../components/MainNavigation';
-import PageContent from '../components/PageContent';
+import { useRouteError, Link, useNavigate } from "react-router-dom";
+import PageContent from "../components/PageContent";
 
 function ErrorPage() {
   const error = useRouteError();
 
-  const history = useNavigate();
+  const navigate = useNavigate();
   const goBack = () => {
-    history(-1); // Go back to the previous page
+    navigate(-1); // Go back to the previous page
   };
 
-  let title =    'An error occurred.';
-  let message =  'Something went wrong!';
-
-
+  let title = "An error occurred.";
+  let message = "Something went wrong!";
 
   if (error.status === 500) {
     message = error.data.message;
   }
 
   if (error.status === 404) {
-    title = 'Not found.';
-    message = 'Could not find resource or page.';
+    title = "Not found.";
+    message = "Could not find resource or page.";
   }
 
   return (
     <>
-      <MainNavigation />
+      <nav className="navbar navbar-expand-lg bg-primary navbar-dark ">
+        <div className="container-fluid">
+          <span className="navbar-brand fw-bold">
+            <i className="bi bi-bootstrap"></i> Blogging
+          </span>
+        </div>
+      </nav>
       <PageContent title={title}>
-        <div className='alert bg-danger text-white fw-bold'>{message}
-       </div>
-       <p>To go back please click <Link onClick={goBack} className=' btn-link'>back</Link> to go to the log in page click <Link to="/">here</Link>.</p>
+        <div className="alert bg-danger text-white fw-bold">{message}</div>
+        <p>
+          To go back please click{" "}
+          <Link onClick={goBack} className=" btn-link">
+            here
+          </Link>{", "}
+          to go to the log in page click <Link to="/">here</Link>.
+        </p>
       </PageContent>
     </>
   );

@@ -297,10 +297,10 @@ function BlogsList() {
                     </small>
                   </Link>
                 </div>
-                <div className="card-footer bg-light text-center btn-group">
+                {blog.user.id === user ?  <div className="card-footer bg-light text-center btn-group">
                   <button
                     className="btn btn-sm m-1 btn-warning  rounded"
-                    disabled={blog.user.id === user ? false : true}
+                    // disabled={blog.user.id === user ? false : true}
                     onClick={() => updateHandler(blog.id)}
                     title="Edit Item"
                   >
@@ -308,13 +308,14 @@ function BlogsList() {
                   </button>
                   <button
                     className="btn btn-sm m-1 btn-danger rounded"
-                    disabled={blog.user.id === user ? false : true}
+                    // disabled={blog.user.id === user ? false : true}
                     onClick={() => deleteHandler(blog.id)}
                     title="Delete Item"
                   >
                     <i className="bi bi-trash"></i> Delete
                   </button>
-                </div>
+                </div> : ""}
+               
               </div>
             ))
           ) : (

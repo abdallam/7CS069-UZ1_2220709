@@ -26,6 +26,7 @@ function LoginForm() {
               theme: "colored",
             });
         } else if (response.data.error === 0) {
+          sessionStorage.clear();
           sessionStorage.setItem(
             "credentials",
             JSON.stringify(response.data.data)
@@ -54,11 +55,8 @@ function LoginForm() {
         </div>
         <div className="card-body bg-body">
           <Form method="post" onSubmit={handleSubmit}>
-            <div className="form-group row mb-1">
-              <label htmlFor="email" className="col-sm-2 col-form-label">
-                Email
-              </label>
-              <div className="col-sm-10">
+            <div className=" mb-1">
+             
                 <input
                   type="email"
                   className="form-control"
@@ -67,22 +65,20 @@ function LoginForm() {
                   required
                   minLength={5}
                   autoFocus={true}
-                  placeholder=" someone@example.com"
+                  placeholder="Type in your email eg. someone@example.com"
                 />
-              </div>
             </div>
-            <div className="form-group row mb-1">
-              <label htmlFor="password" className="col-sm-2 col-form-label">
-                Password
-              </label>
-              <div className="col-sm-10">
+            <div className=" mb-1">
+             
                 <input
                   type="password"
                   className="form-control"
                   id="password"
                   name="password"
+                  placeholder="Type in your password"
+
                 />
-              </div>
+             
             </div>
 
             <div className="col-sm-12 ">

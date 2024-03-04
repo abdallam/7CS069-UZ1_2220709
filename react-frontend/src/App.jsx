@@ -19,6 +19,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <BlogsPage />,
+    
       },
       {
         path: "show/:blogId",
@@ -36,6 +37,8 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
+    errorElement: <ErrorPage />,
+
   },
 ]);
 
