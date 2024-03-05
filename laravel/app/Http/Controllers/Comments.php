@@ -80,7 +80,7 @@ class Comments extends Controller
             }
         } else {
             $this->output["error"] = 1;
-            $this->output["message"] = 'Invalid ID';
+            $this->output["message"] = $validator->errors()->all();
         }
         return response($this->output, 200);
     }

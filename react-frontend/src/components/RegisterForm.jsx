@@ -1,7 +1,9 @@
-import { Form } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 function RegisterForm() {
+  const navigate = useNavigate();
+
   function handleSubmit(e) {
     document.getElementById("regBtn").disabled = true;
     e.preventDefault();
@@ -35,10 +37,7 @@ function RegisterForm() {
       })
       .catch((error) => {
         document.getElementById("regBtn").disabled = false;
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+        navigate("/error");
       });
   }
   return (
@@ -50,43 +49,35 @@ function RegisterForm() {
         <div className="card-body bg-body">
           <Form method="post" onSubmit={handleSubmit}>
             <div className=" mb-1">
-             
-                <input
-                  type="text"
-                  className="form-control"
-                  id="name"
-                  name="name"
-                  autoFocus={true}
-                  required
-                  minLength={5}
-                  placeholder="Type in your fullname"
-
-                />
-             
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                autoFocus={true}
+                required
+                minLength={5}
+                placeholder="Type in your fullname"
+              />
             </div>
             <div className=" mb-1">
-             
-                <input
-                  type="email"
-                  className="form-control"
-                  name="email"
-                  required
-                  minLength={5}
-                  autoFocus
-                  placeholder="Type in your email eg. someone@example.com"
-                />
-           
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                required
+                minLength={5}
+                autoFocus
+                placeholder="Type in your email eg. someone@example.com"
+              />
             </div>
             <div className="  mb-1">
-             
-                <input
-                  type="password"
-                  className="form-control"
-                  name="password"
-                  placeholder="Type in your password"
-
-                />
-             
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                placeholder="Type in your password"
+              />
             </div>
 
             <div className="col-sm-12 ">

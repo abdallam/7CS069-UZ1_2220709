@@ -41,10 +41,8 @@ function LoginForm() {
       .catch((error) => {
         document.getElementById("loginBtn").disabled = false;
 
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+        navigate("/error");
+
       });
   }
   return (

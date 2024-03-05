@@ -11,7 +11,7 @@ function BlogsList() {
   const [loading, setLoading] = useState(false);
 
   const [blogs, setBlogs] = useState([]);
-  const [user] = useState(credentials.id);
+  const [user, setUser] = useState(null);
   const [show, setShow] = useState(false);
   const [blog, setBlog] = useState(null);
   const [flag, setFlag] = useState(false);
@@ -19,6 +19,7 @@ function BlogsList() {
 
   useEffect(() => {
     setLoading(true);
+    setUser(credentials.id);
     getBlogs();
   }, []);
 
@@ -45,10 +46,8 @@ function BlogsList() {
         }
       })
       .catch((error) => {
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+       // console.log(error);
+        navigate("/error");
       });
   }
   const handleClose = () => setShow(false);
@@ -100,11 +99,8 @@ function BlogsList() {
       })
       .catch((error) => {
         document.getElementById("saveBtn").disabled = false;
+        navigate("/error");
 
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
       });
   }
 
@@ -131,10 +127,8 @@ function BlogsList() {
         }
       })
       .catch((error) => {
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+        navigate("/error");
+
       });
   }
 
@@ -166,10 +160,8 @@ function BlogsList() {
           }
         })
         .catch((error) => {
-          console.log(error);
-          toast.error(error.message, {
-            theme: "colored",
-          });
+          navigate("/error");
+
         });
     }
   }
@@ -187,7 +179,6 @@ function BlogsList() {
         }
       )
       .then((response) => {
-        console.log(response.data);
         setLoading(false);
 
         if (response.data.error === 1) {
@@ -214,14 +205,14 @@ function BlogsList() {
       .catch((error) => {
         setLoading(false);
 
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+        navigate("/error");
+
       });
   }
   if (loading) {
-    return <div className="row alert alert-success fw-bold">Loading data...</div>;
+    return (
+      <div className="row alert alert-success fw-bold">Loading data...</div>
+    );
   }
   return (
     <div className="card">
@@ -232,20 +223,16 @@ function BlogsList() {
             <h5>Welcome {credentials.name}</h5>
           </div>
           <div className="col-8">
-            <form
-              className="d-flex "
-              role="search"
-              onSubmit={searchHandler}
-            >
+            <form className="d-flex " role="search" onSubmit={searchHandler}>
               <div className="col">
-              <input
-                className="form-control me-2"
-                type="text"
-                id="search"
-                placeholder="Search"
-                aria-label="Search"
-                required
-              />
+                <input
+                  className="form-control me-2"
+                  type="text"
+                  id="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                  required
+                />
               </div>
               <div className=" input-group col">
                 <button className="btn btn-outline-success " type="submit">
@@ -259,16 +246,15 @@ function BlogsList() {
                   <i className="bi bi-arrow-clockwise"></i> Refresh
                 </button>
                 <button
-              className="btn  btn-outline-primary   "
-              onClick={handleShow}
-              title="Create blog item"
-            >
-              <i className="bi bi-plus-lg"></i> Add
-            </button>
+                  className="btn  btn-outline-primary   "
+                  onClick={handleShow}
+                  title="Create blog item"
+                >
+                  <i className="bi bi-plus-lg"></i> Add
+                </button>
               </div>
             </form>
           </div>
-         
         </div>
       </div>
       <div className="card-body bg-body">
@@ -297,25 +283,28 @@ function BlogsList() {
                     </small>
                   </Link>
                 </div>
-                {blog.user.id === user ?  <div className="card-footer bg-light text-center btn-group">
-                  <button
-                    className="btn btn-sm m-1 btn-warning  rounded"
-                    // disabled={blog.user.id === user ? false : true}
-                    onClick={() => updateHandler(blog.id)}
-                    title="Edit Item"
-                  >
-                    <i className="bi bi-pencil-square"></i> edit
-                  </button>
-                  <button
-                    className="btn btn-sm m-1 btn-danger rounded"
-                    // disabled={blog.user.id === user ? false : true}
-                    onClick={() => deleteHandler(blog.id)}
-                    title="Delete Item"
-                  >
-                    <i className="bi bi-trash"></i> Delete
-                  </button>
-                </div> : ""}
-               
+                {blog.user.id === user ? (
+                  <div className="card-footer bg-light text-center btn-group">
+                    <button
+                      className="btn btn-sm m-1 btn-warning  rounded"
+                      // disabled={blog.user.id === user ? false : true}
+                      onClick={() => updateHandler(blog.id)}
+                      title="Edit Item"
+                    >
+                      <i className="bi bi-pencil-square"></i> edit
+                    </button>
+                    <button
+                      className="btn btn-sm m-1 btn-danger rounded"
+                      // disabled={blog.user.id === user ? false : true}
+                      onClick={() => deleteHandler(blog.id)}
+                      title="Delete Item"
+                    >
+                      <i className="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             ))
           ) : (

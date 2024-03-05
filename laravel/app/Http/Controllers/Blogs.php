@@ -122,8 +122,8 @@ class Blogs extends Controller
         $id = (int) $param;
         if (is_int($id) && $id > 0) {
             $validator = Validator::make($request->all(), [
-                'title' => 'required|string',
-                'body' => 'required',
+                'title' => 'nullable|min:5|max:255',
+                'body' => 'nullable|min:5',
                 'photo' => 'mimes:png,jpeg,jpg|max:5048|nullable'
 
             ]);
@@ -146,8 +146,8 @@ class Blogs extends Controller
 
 
                     $obj = Blog::where('id',  $old->id)->update([
-                        'title' => $request->title,
-                        'body_text' => $request->body,
+                        'title' => (isset($request->title))? $request->title : $old->title,
+                        'body_text' => (isset($request->body))? $request->body : $old->body_text,
                         'photo' =>  is_null($fileName) ? Str::after($old->file_path, 'blogs/') : $fileName,
                         'file_path' => is_null($file_path) ? $old->file_path : $file_path,
                         'alive' => 1,
@@ -174,12 +174,12 @@ class Blogs extends Controller
             $this->output["error"] = 1;
             $this->output["message"] = 'Invalid ID';
         }
-        return response(json_encode($this->output), 200)->header('Content-Type', 'application/json');
+        return response($this->output, 200);
     }
     public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required',
+            'id' => 'required|integer',
         ]);
         if ($validator->errors()->isEmpty()) {
             try {
@@ -195,7 +195,7 @@ class Blogs extends Controller
             }
         } else {
             $this->output["error"] = 1;
-            $this->output["message"] = 'Invalid ID';
+            $this->output["message"] = $validator->errors()->all();
         }
         return response($this->output, 200);
     }

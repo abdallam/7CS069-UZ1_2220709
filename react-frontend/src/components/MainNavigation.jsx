@@ -35,10 +35,8 @@ function MainNavigation() {
             }
           })
           .catch((error) => {
-            console.log(error);
-            toast.error(error.message, {
-              theme: "colored",
-            });
+            navigate("/error");
+
           });
       }
     }

@@ -1,4 +1,4 @@
-import { Form, Link, useParams } from "react-router-dom";
+import { Form, Link, useParams, useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
@@ -7,9 +7,11 @@ import axios from "axios";
 
 function BlogItem({ blog }) {
   const credentials = JSON.parse(sessionStorage.getItem("credentials"));
+  const navigate = useNavigate();
+
   const bottomRef = useRef(null);
   const [user] = useState(credentials.id);
-  
+
   const params = useParams();
   const blogId = params.blogId;
   const [comms, setComms] = useState([]);
@@ -47,10 +49,7 @@ function BlogItem({ blog }) {
       .catch((error) => {
         setLoading(false);
 
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+        navigate("/error");
       });
   }
   function commentHandler() {
@@ -106,10 +105,8 @@ function BlogItem({ blog }) {
       .catch((error) => {
         document.getElementById("saveCommentBtn").disabled = false;
 
-        console.log(error);
-        toast.error(error.message, {
-          theme: "colored",
-        });
+        navigate("/error");
+
       });
   }
   function deleteComment(id) {
@@ -147,10 +144,8 @@ function BlogItem({ blog }) {
           }
         })
         .catch((error) => {
-          console.log(error);
-          toast.error(error.message, {
-            theme: "colored",
-          });
+          navigate("/error");
+
         });
     }
   }
@@ -191,9 +186,11 @@ function BlogItem({ blog }) {
         </p>
       </div>
       <div className="card-footer">
-      
-      
-        {(loading)? <div className="row alert alert-success fw-bold ">Loading data...</div> : (comms.length > 0 ? (
+        {loading ? (
+          <div className="row alert alert-success fw-bold ">
+            Loading data...
+          </div>
+        ) : comms.length > 0 ? (
           comms.map((comm) => (
             <div
               className="flex-shrink-1  bg-light rounded  px-3 me-3"
@@ -205,16 +202,18 @@ function BlogItem({ blog }) {
                   {comm.user.name} [{comm.user.email}]
                 </small>
 
-                {comm.user.id === user ? <button
-                  className="btn btn-sm btn-danger rounded float-end"
-                  title="Delete Comment"
-                  onClick={() => deleteComment(comm.id)}
-                  // disabled={comm.user.id === user ? false : true}
-
-                >
-                  <i className="bi bi-trash"></i> Delete
-                </button> :  ""}
-               
+                {comm.user.id === user ? (
+                  <button
+                    className="btn btn-sm btn-danger rounded float-end"
+                    title="Delete Comment"
+                    onClick={() => deleteComment(comm.id)}
+                    // disabled={comm.user.id === user ? false : true}
+                  >
+                    <i className="bi bi-trash"></i> Delete
+                  </button>
+                ) : (
+                  ""
+                )}
               </div>
               <p> {comm.comment}</p>
               <hr />
@@ -222,9 +221,9 @@ function BlogItem({ blog }) {
           ))
         ) : (
           <div className="alert bg-danger text-white fw-bold">
-              There are no comments found.
-            </div>
-        ))}
+            There are no comments found.
+          </div>
+        )}
       </div>
       <Modal
         size="lg"
